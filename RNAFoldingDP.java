@@ -7,25 +7,24 @@
 public class RNAFoldingDP implements RNAFolding {
 
 	public int opt(String rna) {
-		int N = rna.length();
-		return opt(" " + rna, 0, N);
+		int n = rna.length();
+        int[][] M = new int[n][n+1];
 
-	}
-	public int opt(String rna, int i, int j) {
-		if (i >= j - 4) {
-			return 0;
-		}
-	
-		int maxPairs = opt(rna, i, j - 1);
-		for (int t = i; t < j-1; t++) {
-			if (RNAFolding.match(rna.charAt(t), rna.charAt(j))) {
-				int value = 1 + opt(rna, i, t - 1) + opt(rna, t + 1, j - 1);
-				maxPairs = Math.max(maxPairs, value);
+		for (int i = 5; i <= n; i++){
+            for (int j = 0; j <= n - i; j++) {
+				int tail = i + j - 1;
+                M[j][i] = M[j][i - 1];
+				for (int k = j; k < tail - 4; k ++) {
+					if (RNAFolding.match(rna.charAt(k), rna.charAt(tail))) {
+						int value = k > j ? M[j][k - 1] : 0;
+						value += 1 + M[k + 1][tail - 1];
+                        M[j][tail] = Math.max(M[j][tail], value);
+                    }
+				}
 			}
 		}
-		return maxPairs;
+		return M[0][n - 1];
 	}
-
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0) {
 			String fileName = args[0];
