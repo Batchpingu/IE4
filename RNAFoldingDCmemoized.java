@@ -5,35 +5,41 @@
  */
 
 public class RNAFoldingDCmemoized implements RNAFolding {
+	private int[][] M;
 
 	public int opt(String rna) {
-		int N = rna.length();
-		return opt(" " + rna, 1, N);
-    }
-	public int opt (String rna, int i, int j){
 		int n = rna.length();
-		int[][] M = new int[n][n];
+		M = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                M[i][j] = -1;
+            }
+        }
+        return compOpt(rna, 0, n - 1);
+    }
+	public int compOpt (String rna, int i, int j){
+        if (j - i + 1 < 5) {
+            return 0;
+        }
 
-        for (int len = 5; len <= n; len++) {
-            for (int start = 0; start <= n - len; start++) {
-                int end = start + len - 1;
-                int jNotUsed = M[start][end - 1];
-                int jUsed = jNotUsed;
-                char jB = rna.charAt(end);
+        if (M[i][j] != -1) {
+            return M[i][j];
+        }
 
-                for (int t = start; t < end - 4; t++) {
-                    char tB = rna.charAt(t);
-                    if (RNAFolding.match(tB, jB)) {
-                        int value = 1 + (t > start ? M[start][t - 1] : 0) + M[t + 1][end - 1];
-                        jUsed = Math.max(jUsed, value);
-                    }
-                }
+        int result = compOpt(rna, i, j - 1);
 
-                M[start][end] = Math.max(jNotUsed, jUsed);
+        // Consider all possible valid pairings
+        for (int k = i; k <= j - 4; k++) {
+            if (RNAFolding.match(rna.charAt(k), rna.charAt(j))) {
+                int value = (k > i) ? compOpt(rna, i, k - 1) : 0;
+                value += 1 + compOpt(rna, k + 1, j - 1);
+                result = Math.max(result, value);
             }
         }
 
-        return M[i][j];
+        // Memoize and return the result
+        M[i][j] = result;
+        return result;
 	}
 
 
