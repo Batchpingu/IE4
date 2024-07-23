@@ -6,7 +6,7 @@
 
 public class RNAFoldingDP implements RNAFolding {
 
-		public int opt(String rna) {
+	public int opt(String rna) {
 		int N = rna.length();
 		return opt(" " + rna, 1, N);
     }
@@ -17,25 +17,25 @@ public class RNAFoldingDP implements RNAFolding {
         for (int len = 5; len <= n; len++) {
             for (int start = 0; start <= n - len; start++) {
                 int end = start + len - 1;
-                int jNotUsed = M[start][end - 1];
-                int jUsed = jNotUsed;
-                char jB = rna.charAt(end);
+                int jCurr = M[start][end - 1];
+                int jUsed = jCurr;
+                char jChar = rna.charAt(end);
 
-                for (int t = start; t < end - 4; t++) {
-                    char tB = rna.charAt(t);
-                    if (RNAFolding.match(tB, jB)) {
-                        int value = 1 + (t > start ? M[start][t - 1] : 0) + M[t + 1][end - 1];
+                for (int k = start; k < end - 4; k++) {
+                    char tChar = rna.charAt(k);
+                    if (RNAFolding.match(tChar, jChar)) {
+						int value = k > start ? M[start][k - 1] : 0;
+						value += 1 + M[k + 1][end - 1];
                         jUsed = Math.max(jUsed, value);
                     }
                 }
 
-                M[start][end] = Math.max(jNotUsed, jUsed);
+                M[start][end] = Math.max(jCurr, jUsed);
             }
         }
 
         return M[i][j];
 	}
-    }
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0) {
 			String fileName = args[0];
