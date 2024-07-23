@@ -6,28 +6,35 @@
 
 public class RNAFoldingDP implements RNAFolding {
 
-	public int opt(String rna) {
-	
+		public int opt(String rna) {
+		int N = rna.length();
+		return opt(" " + rna, 1, N);
+    }
+	public int opt (String rna, int i, int j){
 		int n = rna.length();
-        int[][] M = new int[n][n + 1];
+		int[][] M = new int[n][n];
 
+        for (int len = 5; len <= n; len++) {
+            for (int start = 0; start <= n - len; start++) {
+                int end = start + len - 1;
+                int jNotUsed = M[start][end - 1];
+                int jUsed = jNotUsed;
+                char jB = rna.charAt(end);
 
-        for (int length = 5; length <= n; length++) {
-            for (int start = 0; start <= n - length; start++) {
-                int end = start + length - 1;
-                M[start][length] = M[start][length - 1];  
-
-                for (int k = start; k <= end - 4; k++) {
-                    if (RNAFolding.match(rna.charAt(k), rna.charAt(end))) {
-                        int value = k > start ? M[start][k - start - 1] : 0;
-                        value += 1 + M[k + 1][end - start - 1];
-                        M[start][length] = Math.max(M[start][length], value);
+                for (int t = start; t < end - 4; t++) {
+                    char tB = rna.charAt(t);
+                    if (RNAFolding.match(tB, jB)) {
+                        int value = 1 + (t > start ? M[start][t - 1] : 0) + M[t + 1][end - 1];
+                        jUsed = Math.max(jUsed, value);
                     }
                 }
+
+                M[start][end] = Math.max(jNotUsed, jUsed);
             }
         }
 
-        return M[0][n - 1];
+        return M[i][j];
+	}
     }
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0) {
