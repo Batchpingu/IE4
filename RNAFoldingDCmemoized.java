@@ -15,10 +15,10 @@ public class RNAFoldingDCmemoized implements RNAFolding {
                 M[i][j] = -1;
             }
         }
-        return compOpt(rna, 0, n - 1);
+        return compOpt(" " + rna, 1, n-1);
     }
 	public int compOpt (String rna, int i, int j){
-        if (j - i + 1 < 5) {
+        if (j - i  < 4) {
             return 0;
         }
 
